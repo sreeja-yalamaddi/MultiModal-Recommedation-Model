@@ -3,8 +3,8 @@
 This project provides a simple and extensible setup for building a **multimodal product recommendation system** using OpenAI’s CLIP model. It includes support for:
 
 - Zero-shot retrieval via cosine similarity on CLIP embeddings.
-- LoRA-based fine-tuning to adapt CLIP to your product domain.
-- Optimized LoRA training with precision and validation monitoring.
+- LoRA-based fine-tuning to adapt CLIP to product domain.
+- Optimized LoRA training with mixed precision and validation loss monitoring.
 
 ## Requirements
 
