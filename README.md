@@ -1,6 +1,6 @@
 # CLIP-Based Product Recommendation
 
-This project implements a **multimodal product recommendation system** leveraging [OpenAI’s CLIP](https://openai.com/research/clip) model. 
+This project implements a **multimodal product recommendation system** leveraging [OpenAI’s CLIP](https://huggingface.co/openai/clip-vit-base-patch32) model. 
 It supports both **zero-shot recommendations** and **domain-adaptive fine-tuning** using LoRA (Low-Rank Adaptation), optimized with mixed precision for efficiency.
 
 ## Requirements
