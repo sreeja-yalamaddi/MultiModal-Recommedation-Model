@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ```
 ## Dataset
 
-Leveraged[Amazon reviews data 2023 from huggingface] (https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023) for this study primarily using below features.
+Leveraged [Amazon reviews data 2023 from huggingface] (https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023) for this study primarily using below features.
 
 - product_title
 - product_description
