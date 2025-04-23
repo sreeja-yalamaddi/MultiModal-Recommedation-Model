@@ -12,13 +12,13 @@ pip install -r requirements.txt
 ```
 ## Dataset
 
-Amazon reviews data 2023 from huggingface (https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023). Primarily using below features.
+Leveraged[Amazon reviews data 2023 from huggingface] (https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023) for this study primarily using below features.
 
 - product_title
 - product_description
 - product_image_url
 
-## 🔧 Features
+## Features
 
 -  **Zero-shot retrieval** using cosine similarity over CLIP embeddings.
 -  **LoRA fine-tuning** to adapt CLIP to your specific product catalog.
