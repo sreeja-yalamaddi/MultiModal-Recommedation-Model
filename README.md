@@ -1,10 +1,7 @@
 # CLIP-Based Product Recommendation
 
-This project provides a simple and extensible setup for building a **multimodal product recommendation system** using OpenAI’s CLIP model. It includes support for:
-
-- Zero-shot retrieval via cosine similarity on CLIP embeddings.
-- LoRA-based fine-tuning to adapt CLIP to product domain.
-- Optimized LoRA training with mixed precision and validation loss monitoring.
+This project implements a **multimodal product recommendation system** leveraging [OpenAI’s CLIP](https://openai.com/research/clip) model. 
+It supports both **zero-shot recommendations** and **domain-adaptive fine-tuning** using LoRA (Low-Rank Adaptation), optimized with mixed precision for efficiency.
 
 ## Requirements
 
@@ -15,47 +12,25 @@ pip install -r requirements.txt
 ```
 ## Dataset
 
+Amazon reviews data 2023 from huggingface (https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023). Primarily using below features.
+
 - product_title
 - product_description
 - product_image_url
 
-## Usage
+## 🔧 Features
 
-1. Zero-Shot Embedding + Recommendation
+-  **Zero-shot retrieval** using cosine similarity over CLIP embeddings.
+-  **LoRA fine-tuning** to adapt CLIP to your specific product catalog.
+-  **Optimized training** with mixed precision and validation monitoring.
+-  **FAISS-based similarity search** for scalable and efficient retrieval.
+-  **Multimodal queries** supported (text, image, or both).
 
-Generate CLIP embeddings and perform cosine similarity:
 
-```bash
-python src/main_zero_shot.py
-```
-2. Basic LoRA Fine-Tuning
 
-Train LoRA layers on text-image pairs from your product data:
-
-```bash
-python src/train_lora.py
-```
-3. Optimized LoRA Training
-
-Same as above but with validation monitoring and mixed precision:
-
-```bash
-python src/train_lora_opt.py
-```
-## Query API
-
-See recommend.py for functions:
-
-```
-python
-
-recommend_by_text(text_query, processor, model, df, top_k=5)
-recommend_by_image(image_url, processor, model, df, top_k=5)
-recommend_by_both(text, image_url, processor, model, df, alpha=0.5, top_k=5)
-```
 ## Notes
 
 -   Embeddings are stored and indexed using FAISS.
--   Training is tested on A100 with 200k samples.
+-   Training is tested on A100 with 20k samples and ~100k samples (In progress)
 -   Input queries can be text, image, or both.
 
