@@ -15,7 +15,7 @@ We use OpenAI’s [CLIP](https://openai.com/blog/clip) model to generate joint i
 ##  Dataset
 
 We use the **Amazon Reviews 2023** dataset, Randomly selected below 2 categories for this study:
-- **Fashion **
+- **Fashion**
 - **Home Appliances**
 
 Each product consists of:
