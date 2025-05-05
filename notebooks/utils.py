@@ -2,6 +2,7 @@
 
 import os
 import pandas as pd
+import numpy as np
 import torch
 import torch.nn.functional as F
 import faiss
@@ -18,6 +19,7 @@ from peft import get_peft_model, LoraConfig, TaskType
 # -----------------------------------------------------------------------------
 MODEL_NAME = "openai/clip-vit-base-patch32"
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+PRODUCT_DATA = "product_data_appl_full.csv" # "product_data.csv" for fashion
 
 # -----------------------------------------------------------------------------
 # 1) DATA LOADING & CLEANING
@@ -209,123 +211,3 @@ def generate_embeddings(
             t_list.append(F.normalize(t, p=2, dim=-1).cpu())
             i_list.append(F.normalize(i, p=2, dim=-1).cpu())
     return torch.cat(t_list, dim=0), torch.cat(i_list, dim=0)
-
-
-# -----------------------------------------------------------------------------
-# 6) UNIFIED MULTIMODAL QUERY
-# -----------------------------------------------------------------------------
-def unified_query(
-    input_text: str = None,
-    input_image_path: str = None,
-    approach: str = "zero_shot",
-    save_dir: str = None,
-    k: int = 5
-):
-    """
-    Query the FAISS index for a given approach (zero_shot, lora, or lora_opt).
-    """
-    
-    model = get_model(approach=approach, save_dir=save_dir)
-    model.to(DEVICE).eval()
-
-    df  = pd.read_csv("product_data.csv")
-    idx = load_faiss_index(save_dir)
-
-    # 2) Load processor, then split tokenizer and image_processor
-    proc = CLIPProcessor.from_pretrained(MODEL_NAME, use_fast=True)
-    tokenizer       = proc.tokenizer
-    image_processor = proc.image_processor
-
-    # 3) Prepare inputs
-    # We batch as a single‐element batch so outputs remain [1, D]
-    batch = {}
-    if input_text:
-        tok = tokenizer(
-            [input_text],
-            padding=True,
-            truncation=True,
-            return_tensors="pt"
-        )
-        batch["input_ids"]      = tok.input_ids.to(DEVICE)
-        batch["attention_mask"] = tok.attention_mask.to(DEVICE)
-
-    if input_image_path:
-        if input_image_path.startswith("http"):
-            resp = requests.get(input_image_path, timeout=5)
-            img  = Image.open(BytesIO(resp.content)).convert("RGB")
-        else:
-            img  = Image.open(input_image_path).convert("RGB")
-
-        img_out = image_processor(
-            images=[img],
-            return_tensors="pt"
-        )
-        batch["pixel_values"] = img_out.pixel_values.to(DEVICE)
-
-    # 4) Forward pass
-    with torch.no_grad():
-        if "input_ids" in batch and "pixel_values" in batch:
-            t_emb = model.get_text_features(
-                input_ids=batch["input_ids"],
-                attention_mask=batch["attention_mask"]
-            )
-            i_emb = model.get_image_features(
-                pixel_values=batch["pixel_values"]
-            )
-            q_emb = (t_emb + i_emb) / 2
-        elif "input_ids" in batch:
-            q_emb = model.get_text_features(
-                input_ids=batch["input_ids"],
-                attention_mask=batch["attention_mask"]
-            )
-        else:
-            q_emb = model.get_image_features(
-                pixel_values=batch["pixel_values"]
-            )
-
-    # 5) Normalize, search FAISS
-    q_norm = F.normalize(q_emb, dim=-1).cpu().numpy().astype("float32")
-    scores, ids = idx.search(q_norm, k)
-
-    top_df     = df.iloc[ids[0]].reset_index(drop=True)
-    top_scores = scores[0]
-    return top_df, top_scores
-
-
-# -----------------------------------------------------------------------------
-# 7) BATCH EVALUATION ON AMAZON QUERIES
-# -----------------------------------------------------------------------------
-def evaluate_model_on_queries(
-    query_file: str = "Amazon_recom_queries.xlsx",
-    save_dir: str = "artifacts_zero_shot",
-    k: int = 5
-) -> pd.DataFrame:
-    """
-    Load ground-truth from query_file, run unified_query for each unique query,
-    and return a DataFrame with Amazon GT + model recs + scores.
-    """
-    df_q = pd.read_excel(query_file)
-    grouped = df_q.groupby("Queries").agg({
-        "Product_title":       list,
-        "Product_description": list,
-        "Product_link":        list,
-        "Image_link":          list
-    }).reset_index()
-
-    for col in ["Model_rec_titles","Model_rec_descriptions","Model_rec_links","Model_rec_scores"]:
-        grouped[col] = None
-
-    for i, row in tqdm(grouped.iterrows(), total=len(grouped), desc="Eval queries"):
-        q      = row["Queries"]
-        img_url= row["Image_link"][0] if row["Image_link"] else None
-        try:
-            recs, scores = unified_query(q, img_url, save_dir, k)
-            grouped.at[i, "Model_rec_titles"]       = recs["product_title"].tolist()
-            grouped.at[i, "Model_rec_descriptions"] = recs["product_description"].tolist()
-            grouped.at[i, "Model_rec_links"]        = recs.get("product_link", pd.Series()).tolist()
-            grouped.at[i, "Model_rec_scores"]       = scores.tolist()
-        except Exception as e:
-            print(f"Query `{q}` failed: {e}")
-            continue
-
-    return grouped
