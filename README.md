@@ -63,11 +63,14 @@ Each product contains:
 
 | File | Description |
 |------|-------------|
-| `notebooks/embedding_based_approach.ipynb` | Preprocessing, zero-shot CLIP embeddings, FAISS indexing |
-| `notebooks/Finetune CLIP using LoRA.ipynb` | LoRA-PEFT training and embedding generation |
-| `notebooks/Finetune CLIP LORA MP.ipynb`    | LoRA + Mixed Precision training |
-| `notebooks/Model Eval.ipynb`               | Inference & evaluation for both categories |
-| `notebooks/ground_truth_similarity.ipynb`  | Evaluation using handcrafted ground-truth queries |
+| `scripts/embedding_based_approach.ipynb` | Preprocessing, zero-shot CLIP embeddings, FAISS indexing |
+| `scripts/Finetune CLIP using LoRA.ipynb` | LoRA-PEFT training and embedding generation |
+| `scripts/Finetune CLIP LORA MP.ipynb`    | LoRA + Mixed Precision training |
+| `scripts/Model Eval.ipynb`               | Inference & evaluation for both categories |
+| `scripts/ground_truth_similarity.ipynb`  | Evaluation using handcrafted ground-truth queries |
+| `scripts/evaluate.py`  | core retrieval engine used by both the demo app and for batch evaluation |
+| `scripts/app.py` | Gradio-based UI for interactive multimodal product search |
+
 > Ground truth queries: `./ground_truth/`
 
 ---
