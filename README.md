@@ -27,6 +27,7 @@ Each product consists of:
 - Cleaned and tokenized summaries.
 - Resized images to 224×224 (CLIP-compatible).
 - Retained one representative image per product.
+- Cleaned data of each of category can be found at path - ./input_data/product_data_{category}.csv
 
 ## Training setup:
 -	Batch size: 128
@@ -64,3 +65,7 @@ Artifacts for each of 3 approaches for the two categories are in following paths
 > - LoRA-PEFT - ./embeddings/artifacts_lora_appliances/
 > - LoRA-PEFT with MixedPrecision - ./embeddings/artifacts_lora_mp_appliances/
 
+
+## Sample Demo 
+
+A sample demo is hosted on gradio app , can be accessed through this path https://huggingface.co/spaces/Sreeja05/MultiModalRecommendations
