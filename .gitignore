@@ -1,6 +1,6 @@
-/data
 /indexes
 /logs
-/embeddings
+/model_artifacts
 /.conda
 /src
+/input_data

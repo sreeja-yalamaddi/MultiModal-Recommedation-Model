@@ -3,20 +3,20 @@
 import os
 import gradio as gr
 import pandas as pd
-from retriever import Retriever   # your Retriever class
+from evaluate import Retriever   # your Retriever class
 
 # ─── CONFIG ────────────────────────────────────────────────────────────────
 MODEL_CONFIG = {
-    ("CLIP ZeroShot",   "Fashion"):    "artifacts_RAG",
-    ("CLIP ZeroShot",   "Appliances"): "artifacts_zeroshot_appl",
-    ("CLIP Fine tuned", "Fashion"):    "artifacts_lora",
-    ("CLIP Fine tuned", "Appliances"): "artifacts_lora_appl",
+    ("CLIP ZeroShot",   "Beauty"):    "model_artifacts/artifacts_zeroshot_beauty",
+    ("CLIP ZeroShot",   "Appliances"): "model_artifacts/artifacts_zeroshot_appliances",
+ #   ("CLIP Fine tuned", "Beauty"):    "model_artifacts/artifacts_lora_beauty",
+ #   ("CLIP Fine tuned", "Appliances"): "model_artifacts/artifacts_lora_appliances",
 }
 
 # 2) For each category, point to its CSV filename (inside the above dir)
 PRODUCT_CSV = {
-    "Fashion":    "product_data.csv",
-    "Appliances": "product_data_appl_full.csv",
+    "Beauty":    "input_data/product_data_beauty.csv",
+    "Appliances": "input_data/product_data_appliances.csv",
 }
 
 TOP_K    = 5
@@ -27,7 +27,7 @@ CATEGORIES = sorted({cat for _, cat in MODEL_CONFIG})
 # ─── 1) INSTANTIATE ONE Retriever PER (APPROACH, CATEGORY) ────────────────
 retrievers = {}
 for (approach, category), faiss_dir in MODEL_CONFIG.items():
-    csv_path = os.path.join(faiss_dir, PRODUCT_CSV[category])
+    csv_path = os.path.join(PRODUCT_CSV[category])
     retrievers[(approach, category)] = Retriever(
         approach    = "zero_shot" if "ZeroShot" in approach else "lora",
         faiss_dir   = faiss_dir,
@@ -146,4 +146,4 @@ with gr.Blocks(title="Multimodal Product Search") as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7869, share=True)
+    demo.launch()

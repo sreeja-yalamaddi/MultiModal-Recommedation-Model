@@ -19,7 +19,7 @@ from peft import get_peft_model, LoraConfig, TaskType
 # -----------------------------------------------------------------------------
 MODEL_NAME = "openai/clip-vit-base-patch32"
 DEVICE     = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-PRODUCT_DATA = "product_data_appl_full.csv" # "product_data.csv" for fashion
+PRODUCT_DATA = "meta_data_beauty.csv" # "product_data_appliances.csv" for appliances
 
 # -----------------------------------------------------------------------------
 # 1) DATA LOADING & CLEANING

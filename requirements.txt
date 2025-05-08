@@ -1,6 +1,9 @@
+gradio
 torch
 transformers
 peft
 tqdm
 pillow
 faiss-cpu  # or faiss-gpu if available
+pandas 
+numpy
