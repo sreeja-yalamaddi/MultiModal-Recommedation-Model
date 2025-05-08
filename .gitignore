@@ -4,3 +4,4 @@
 /.conda
 /src
 /input_data
+/ground_truth
