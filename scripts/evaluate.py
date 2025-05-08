@@ -156,8 +156,7 @@ def evaluate_approach_fast(
     }).reset_index()
 
     # 2. Initialize retriever
-    retriever = Retriever(approach="zero_shot", faiss_dir=approach_dir, product_csv="product_data_appl_full.csv")
-
+    retriever = Retriever(approach="zero_shot", faiss_dir=approach_dir, product_csv=product_csv)
     # 3. Prepare output columns
     grouped["Model_rec_titles"] = None
     grouped["Model_rec_scores"] = None
