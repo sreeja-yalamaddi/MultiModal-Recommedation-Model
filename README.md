@@ -1,71 +1,96 @@
-# CLIP-Based Product Recommendation
-  
-## Project Overview
+# CLIP-Based Multimodal Product Recommendation
 
-We use OpenAI’s [CLIP](https://openai.com/blog/clip) model to generate joint image-text embeddings for products. To adapt CLIP to the domain-specific nuances of product metadata, we apply **parameter-efficient fine-tuning** (LoRA) on top of frozen CLIP weights. We further explore preprocessing techniques such as summarizing verbose product metadata using **BART**, which significantly boosts retrieval performance.
+##  Project Overview
 
-> This repository shows our experiments based on:
-> - Zero-shot CLIP
-> - LoRA-PEFT fine-tuning (with and without mixed precision)
-> - Faiss-based retrieval
-> - AvgMeanSimilarity@5 evaluation metric
+We use OpenAI’s [CLIP](https://openai.com/blog/clip) model to generate joint image-text embeddings for products. To adapt CLIP to domain-specific nuances in e-commerce, we apply **parameter-efficient fine-tuning** (LoRA) on top of frozen CLIP weights. We also explore text preprocessing via **BART-based summarization**, which significantly boosts retrieval performance.
+
+> This repository demonstrates:
+> - Zero-shot CLIP retrieval
+> - LoRA-PEFT fine-tuning (standard and mixed-precision)
+> - FAISS-based similarity search
+> - Custom evaluation using **AvgMeanSimilarity@5**
 
 ---
 
 ##  Dataset
 
-We use the **Amazon Reviews 2023** dataset, Randomly selected below 2 categories for this study:
-- **Fashion**
-- **Home Appliances**
+We use the **Amazon Reviews 2023** dataset, selecting two categories:
 
-Each product consists of:
-- Image(s)
+- `Beauty`
+- `Home Appliances`
+
+Each product contains:
+- At least one image
 - Metadata: title, brand, description, etc.
 
-### Data Preprocessing
-- Used `facebook/bart-large-cnn` to summarize metadata into concise product descriptions.
-- Cleaned and tokenized summaries.
-- Resized images to 224×224 (CLIP-compatible).
-- Retained one representative image per product.
-- Cleaned data of each of category can be found at path - ./input_data/product_data_{category}.csv
+###  Data Preprocessing
 
-## Training setup:
--	Batch size: 128
--	Learning rate: 2e-5
--	Epochs: 10
-- Optimizer: AdamW
--	Hardware: NVIDIA A100 (40 GB)
-  
----
+- Summarized product metadata using `facebook/bart-large-cnn`
+- Cleaned and tokenized the summaries
+- Resized images to **224×224** (CLIP input format)
+- Retained one representative image per product
 
-##  Model Variants
-
-| Model Type          | Fashion Score | Appliances Score |
-|---------------------|---------------|------------------|
-| CLIP Zero-Shot      | 0.6725        | 0.8498           |
-| LoRA Fine-Tuned     | 0.7939        | 0.9073           |
-| LoRA + MixedPrecision | 0.7255     | 0.8746           |
-| Ground Truth CLIP Embedding | 0.5086 | 0.5300          |
-
-> Evaluation metric: **AvgMeanSimilarity@5**
+> Cleaned data files:
+> - `./input_data/product_data_beauty.csv`
+> - `./input_data/product_data_appliances.csv`
 
 ---
 
-## Model Artifacts
+##  Training Setup
 
-Artifacts for each of 3 approaches for the two categories are in following paths:
+- Batch size: 128  
+- Learning rate: 2e-5  
+- Epochs: 10  
+- Optimizer: AdamW  
+- Hardware: NVIDIA A100 (40 GB)
 
-1. Fashion 
-> - Zero-shot - ./embeddings/artifacts_zeroshot_fashion/
-> - LoRA-PEFT - ./embeddings/artifacts_lora_fashion/
-> - LoRA-PEFT with MixedPrecision - ./embeddings/artifacts_lora_mp_fashion/
+---
 
-2. Appliances 
-> - Zero-shot - ./embeddings/artifacts_zeroshot_appliances/
-> - LoRA-PEFT - ./embeddings/artifacts_lora_appliances/
-> - LoRA-PEFT with MixedPrecision - ./embeddings/artifacts_lora_mp_appliances/
+##  Model Variants & Evaluation
+
+| Model Type              | Beauty Score | Appliances Score |
+|-------------------------|--------------|------------------|
+| CLIP Zero-Shot          | 0.6725       | 0.8498           |
+| LoRA Fine-Tuned         | 0.7939       | 0.9073           |
+| LoRA + Mixed Precision  | 0.7255       | 0.8746           |
+| Ground Truth Embedding  | 0.5086       | 0.5300           |
+
+> Metric: **AvgMeanSimilarity@5**
+
+---
+
+##  Notebooks & Scripts
+
+| File | Description |
+|------|-------------|
+| `notebooks/embedding_based_approach.ipynb` | Preprocessing, zero-shot CLIP embeddings, FAISS indexing |
+| `notebooks/Finetune CLIP using LoRA.ipynb` | LoRA-PEFT training and embedding generation |
+| `notebooks/Finetune CLIP LORA MP.ipynb`    | LoRA + Mixed Precision training |
+| `notebooks/Model Eval.ipynb`               | Inference & evaluation for both categories |
+| `notebooks/ground_truth_similarity.ipynb`  | Evaluation using handcrafted ground-truth queries |
+> Ground truth queries: `./ground_truth/`
+
+---
+
+##  Model Artifacts
+
+| Category   | Model Variant           | Path |
+|------------|-------------------------|------|
+| Beauty     | Zero-shot               | `./embeddings/artifacts_zeroshot_beauty/` |
+| Beauty     | LoRA-PEFT               | `./embeddings/artifacts_lora_beauty/` |
+| Beauty     | LoRA + Mixed Precision  | `./embeddings/artifacts_lora_mp_beauty/` |
+| Appliances | Zero-shot               | `./embeddings/artifacts_zeroshot_appliances/` |
+| Appliances | LoRA-PEFT               | `./embeddings/artifacts_lora_appliances/` |
+| Appliances | LoRA + Mixed Precision  | `./embeddings/artifacts_lora_mp_appliances/` |
+
+---
+
+##  Gradio Demo
+
+Try out the multimodal recommendation demo here:  
+ [Gradio Space Link](https://huggingface.co/spaces/Sreeja05/MultiModalRecommendations)
+
+> Input a product description, image URL or upload an image, choose a model variant and category, and see top-K matching products.
 
 
-## Sample Demo 
 
-A sample demo is hosted on gradio app , can be accessed through this path https://huggingface.co/spaces/Sreeja05/MultiModalRecommendations
